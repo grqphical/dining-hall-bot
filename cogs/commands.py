@@ -13,13 +13,13 @@ class Commands(commands.Cog):
     async def at_dining_hall(self, interaction: discord.Interaction):
         db = self.bot.get_cog("Database")
         db.set(interaction.user, True)
-        await interaction.response.send_message(f"{interaction.user.mention} is in the dining commons")
+        await interaction.response.send_message(f"updated status", ephemeral=True)
     
     @app_commands.command(name="notatdininghall", description="Sets your status to 'not in the dining commons'")
     async def not_at_dining_hall(self, interaction: discord.Interaction):
         db = self.bot.get_cog("Database")
         db.set(interaction.user, False)
-        await interaction.response.send_message(f"{interaction.user.mention} is no longer in the dining commons")
+        await interaction.response.send_message(f"updated status", ephemeral=True)
     
     @app_commands.command(name="currentdiners", description="Gets everyone who is at the dining hall")
     async def current_diners(self, interaction: discord.Interaction):
