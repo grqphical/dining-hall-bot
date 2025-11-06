@@ -32,7 +32,7 @@ class Commands(commands.Cog):
         else:
             for diner in diners:
                 user = await self.bot.fetch_user(diner)
-                e.add_field(name="", value=f"{user.mention} is dining currently", inline=False)
+                e.add_field(name="", value=f"{user.mention} is currently dining", inline=False)
         
         await interaction.response.send_message(embed=e)
     
