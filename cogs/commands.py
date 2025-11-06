@@ -1,4 +1,5 @@
 import discord
+from datetime import datetime
 from discord.ext import commands
 from discord import app_commands
 
@@ -6,6 +7,7 @@ class Commands(commands.Cog):
     def __init__(self, bot: commands.Bot):
         super().__init__()
         self.bot = bot
+        
     
     @app_commands.command(name="atdininghall", description="Sets your status to 'in the dining commons'")
     async def at_dining_hall(self, interaction: discord.Interaction):
@@ -18,6 +20,21 @@ class Commands(commands.Cog):
         db = self.bot.get_cog("Database")
         db.set(interaction.user, False)
         await interaction.response.send_message(f"{interaction.user.mention} is no longer in the dining commons")
+    
+    @app_commands.command(name="currentdiners", description="Gets everyone who is at the dining hall")
+    async def current_diners(self, interaction: discord.Interaction):
+        e = discord.Embed(color=discord.Colour.blue(), title="Current Diners at the Dining Commons", timestamp=datetime.now())
+        db = self.bot.get_cog("Database")
+        diners = db.get_all_diners()
+
+        if len(diners) == 0:
+            e.description = "Hmm no one seems to be in the dining commons"
+        else:
+            for diner in diners:
+                user = await self.bot.fetch_user(diner)
+                e.add_field(name="", value=f"{user.mention} is dining currently", inline=False)
+        
+        await interaction.response.send_message(embed=e)
     
 
 
