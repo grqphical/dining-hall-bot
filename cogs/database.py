@@ -1,10 +1,13 @@
 import discord
 from discord.ext import commands
+from discord.ext import tasks
 
 class Database(commands.Cog):
-    def __init__(self):
+    def __init__(self, bot: commands.Bot):
         super().__init__()
+        self.bot = bot
         self.store = {}
+        self.clear_diners.start()
     
     def set(self, user: discord.User, in_dining_commons: bool):
         self.store[user.id] = in_dining_commons
@@ -18,6 +21,11 @@ class Database(commands.Cog):
             if dining:
                 result.append(user)
         return result
+    @tasks.loop(hours=3)
+    async def clear_diners(self):
+        """Clear the current diners after three hours to maintain accuracy"""
+        self.store = {}
 
+    
 async def setup(bot: commands.Bot):
-    await bot.add_cog(Database())
+    await bot.add_cog(Database(bot))
