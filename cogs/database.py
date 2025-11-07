@@ -30,7 +30,6 @@ class Database(commands.Cog):
     @tasks.loop(seconds=30)
     async def clear_diners(self):
         """Clear the current diners after 90 mins to maintain accuracy"""
-        print("clearing diners")
         for key in self.store.keys():
             user_entered_dc = self.store[key]["timestamp"]
             locked_in = self.store[key]["timestamp"]
