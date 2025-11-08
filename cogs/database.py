@@ -12,8 +12,9 @@ class Database(commands.Cog):
     
     def set(self, user: discord.User, locked_in: bool):
         self.store[user.id] = {
-            "timestamp": datetime.now(),
-            "lockedIn": locked_in
+            "timestamp": datetime.now().timestamp(),
+            "lockedIn": locked_in,
+            "inDC": True
         }
     
     def get(self, user: discord.User) -> bool:
@@ -25,6 +26,8 @@ class Database(commands.Cog):
     def get_all_diners(self) -> list[int]:
         result = []
         for user, info in self.store.items():
+                if info["inDC"] == False:
+                    continue
                 result.append((user, info))
         return result
     @tasks.loop(seconds=30)
@@ -32,13 +35,13 @@ class Database(commands.Cog):
         """Clear the current diners after 90 mins to maintain accuracy"""
         for key in self.store.keys():
             user_entered_dc = self.store[key]["timestamp"]
-            locked_in = self.store[key]["timestamp"]
+            locked_in = self.store[key]["lockedIn"]
             if not locked_in:
-                if (datetime.now() - user_entered_dc).total_seconds() > 90 * 60: # 90 mins
-                    del self.store[key]
+                if datetime.now().timestamp() - user_entered_dc >= 10: # 90 mins
+                    self.store[key]["inDC"] = False
             else:
-                if (datetime.now() - user_entered_dc).total_seconds() > 6 * 60 * 60: # 6 hours
-                    del self.store[key]
+                if datetime.now().timestamp() - user_entered_dc >= 10: # 6 hours
+                    self.store[key]["inDC"] = False
 
     
 async def setup(bot: commands.Bot):
